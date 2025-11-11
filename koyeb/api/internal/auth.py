@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from dependencies import DB_CONNECT_CONFIG
+from ..dependencies import DB_CONNECT_CONFIG
 
 import pymysql
 
