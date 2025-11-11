@@ -28,6 +28,7 @@ async def insert_static_data_into_db(
     credentials: Annotated[HTTPBasicCredentials, Depends(auth.security)],
 ):
     if auth.verify_admin_authentication(credentials.username, credentials.password):
+        print("authed")
         db_fill_starter_data()
         return Response(status_code=status.HTTP_200_OK)
 

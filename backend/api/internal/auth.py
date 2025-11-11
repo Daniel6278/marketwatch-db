@@ -50,5 +50,4 @@ def verify_admin_authentication(username: str, password: str):
             return True
     except:
         pass
-    finally:
-        return False
+    return False
