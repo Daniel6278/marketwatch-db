@@ -18,7 +18,7 @@ UNAUTHORIZED_RESPONSE = HTTPException(
 
 def verify_user_authentication(user_id: str, password_hash: str):
     with pymysql.connect(**DB_CONNECT_CONFIG) as conn, open(
-        "sql/ops/authenticate_user.sql", "r"
+        "../sql/ops/authenticate_user.sql", "r"
     ) as query:
         cursor = conn.cursor()
         cursor.execute(
