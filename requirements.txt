@@ -3,3 +3,5 @@ requests
 psycopg2-binary
 pymysql
 python-dotenv
+alpha_vantage
+pandas

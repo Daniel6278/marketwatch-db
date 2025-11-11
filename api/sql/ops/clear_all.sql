@@ -1,0 +1,7 @@
+DELETE FROM AuditLog;
+DELETE FROM Alert;
+DELETE FROM Holdings;
+DELETE FROM PriceHistory;
+DELETE FROM Portfolio;
+DELETE FROM Ticker;
+DELETE FROM User;

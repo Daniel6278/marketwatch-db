@@ -1,0 +1,8 @@
+[
+    {
+        "portfolio_id": 1,
+        "ticker": "AAPL",
+        "threshold": 240.0,
+        "direction": "above"
+    }
+]

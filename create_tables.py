@@ -14,12 +14,15 @@ load_dotenv()
 
 # Database connection configuration
 DB_CONFIG = {
-    'host': os.getenv('DB_HOST', 'main-marketwatch-db.c74uqiecyemg.us-east-2.rds.amazonaws.com'),
-    'port': int(os.getenv('DB_PORT', 3306)),
-    'user': os.getenv('DB_USER', 'admin'),
-    'password': os.getenv('DB_PASSWORD'),
-    'database': os.getenv('DB_NAME', 'portfolio_db')
+    "host": os.getenv(
+        "DB_HOST", "main-marketwatch-db.c74uqiecyemg.us-east-2.rds.amazonaws.com"
+    ),
+    "port": int(os.getenv("DB_PORT", 3306)),
+    "user": os.getenv("DB_USER", "admin"),
+    "password": os.getenv("DB_PASSWORD"),
+    "database": os.getenv("DB_NAME", "portfolio_db"),
 }
+
 
 def get_connection():
     """Establish database connection"""
@@ -30,6 +33,7 @@ def get_connection():
     except Exception as e:
         print(f"✗ Error connecting to database: {e}")
         sys.exit(1)
+
 
 def drop_existing_tables(cursor):
     """Drop existing tables if they exist (for clean re-runs)"""
@@ -42,12 +46,13 @@ def drop_existing_tables(cursor):
         "DROP TABLE IF EXISTS PriceHistory",
         "DROP TABLE IF EXISTS Portfolio",
         "DROP TABLE IF EXISTS Ticker",
-        "DROP TABLE IF EXISTS User"
+        "DROP TABLE IF EXISTS User",
     ]
 
     for statement in drop_statements:
         cursor.execute(statement)
         print(f"  ✓ {statement}")
+
 
 def create_user_table(cursor):
     """Create User table"""
@@ -68,6 +73,7 @@ def create_user_table(cursor):
     cursor.execute(sql)
     print("  ✓ User table created")
 
+
 def create_ticker_table(cursor):
     """Create Ticker table"""
     print("\nCreating Ticker table...")
@@ -85,6 +91,7 @@ def create_ticker_table(cursor):
 
     cursor.execute(sql)
     print("  ✓ Ticker table created")
+
 
 def create_price_history_table(cursor):
     """Create PriceHistory table"""
@@ -123,6 +130,7 @@ def create_price_history_table(cursor):
     cursor.execute(sql)
     print("  ✓ PriceHistory table created")
 
+
 def create_portfolio_table(cursor):
     """Create Portfolio table"""
     print("\nCreating Portfolio table...")
@@ -146,6 +154,7 @@ def create_portfolio_table(cursor):
 
     cursor.execute(sql)
     print("  ✓ Portfolio table created")
+
 
 def create_holdings_table(cursor):
     """Create Holdings table"""
@@ -180,6 +189,7 @@ def create_holdings_table(cursor):
 
     cursor.execute(sql)
     print("  ✓ Holdings table created")
+
 
 def create_alert_table(cursor):
     """Create Alert table"""
@@ -217,6 +227,7 @@ def create_alert_table(cursor):
     cursor.execute(sql)
     print("  ✓ Alert table created")
 
+
 def create_audit_log_table(cursor):
     """Create AuditLog table"""
     print("\nCreating AuditLog table...")
@@ -240,6 +251,7 @@ def create_audit_log_table(cursor):
 
     cursor.execute(sql)
     print("  ✓ AuditLog table created")
+
 
 def create_holdings_trigger(cursor):
     """Create trigger for Holdings table audit logging"""
@@ -283,6 +295,7 @@ def create_holdings_trigger(cursor):
 
     cursor.execute(sql)
     print("  ✓ Holdings audit trigger created")
+
 
 def create_stored_procedure(cursor):
     """Create stored procedure for user portfolio details"""
@@ -333,6 +346,7 @@ def create_stored_procedure(cursor):
     cursor.execute(sql)
     print("  ✓ Stored procedure sp_GetUserPortfolioDetails created")
 
+
 def verify_tables(cursor):
     """Verify all tables were created successfully"""
     print("\nVerifying tables...")
@@ -340,7 +354,15 @@ def verify_tables(cursor):
     cursor.execute("SHOW TABLES")
     tables = [row[0] for row in cursor.fetchall()]
 
-    expected_tables = ['User', 'Ticker', 'PriceHistory', 'Portfolio', 'Holdings', 'Alert', 'AuditLog']
+    expected_tables = [
+        "User",
+        "Ticker",
+        "PriceHistory",
+        "Portfolio",
+        "Holdings",
+        "Alert",
+        "AuditLog",
+    ]
 
     print(f"\nTables created: {len(tables)}")
     for table in tables:
@@ -352,6 +374,8 @@ def verify_tables(cursor):
         return False
 
     return True
+
+
 def main():
     """Main execution function"""
     print("=" * 70)
@@ -359,7 +383,7 @@ def main():
     print("=" * 70)
 
     # Check if password is set
-    if not DB_CONFIG['password']:
+    if not DB_CONFIG["password"]:
         print("\n✗ Error: DB_PASSWORD environment variable is not set")
         print("  Please create a .env file with DB_PASSWORD=your_password")
         sys.exit(1)
@@ -391,7 +415,9 @@ def main():
         # Verify tables
         if verify_tables(cursor):
             print("\n" + "=" * 70)
-            print("✓ SUCCESS: All tables, triggers, and procedures created successfully!")
+            print(
+                "✓ SUCCESS: All tables, triggers, and procedures created successfully!"
+            )
             print("=" * 70)
         else:
             print("\n✗ ERROR: Some tables are missing")
@@ -405,6 +431,7 @@ def main():
         cursor.close()
         connection.close()
         print("\nDatabase connection closed")
+
 
 if __name__ == "__main__":
     main()
