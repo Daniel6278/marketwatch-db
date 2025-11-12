@@ -120,7 +120,7 @@ async def view_table(
                         cursor.fetchall()
                     )  # Fetches all results as a list of tuples
                 return Response(
-                    json.dumps({"columns": columns_infos, "rows": results}),
+                    json.dumps({"columns": columns_infos, "rows": results}, default=float),
                     media_type="application/json",
                 )
 
