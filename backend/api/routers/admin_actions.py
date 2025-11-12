@@ -105,7 +105,11 @@ async def view_table(
                         {
                             "name": col_name,
                             "data_type": col_dtype,
-                            "refs": col_refs,
+                            "refs": [
+                                ref_table_name
+                                for ref_table_name in col_refs
+                                if isinstance(ref_table_name, str)
+                            ],
                         }
                         for (col_name, col_dtype), col_refs in columns_infos.items()
                     ]
