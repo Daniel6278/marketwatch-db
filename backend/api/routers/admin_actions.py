@@ -53,7 +53,9 @@ async def list_tables(
     credentials: Annotated[HTTPBasicCredentials, Depends(auth.security)],
 ):
     if auth.verify_admin_authentication(credentials.username, credentials.password):
-        return json.dumps(ADMIN_AUTHORIZED_TABLES_NAMES, indent=4)
+        return Response(
+            json.dumps(ADMIN_AUTHORIZED_TABLES_NAMES), media_type="application/json"
+        )
 
 
 @router.get("/table/{table_name}", tags=["admin"])
@@ -61,19 +63,22 @@ async def view_table(
     table_name: str,
     credentials: Annotated[HTTPBasicCredentials, Depends(auth.security)],
 ):
+    PRIVATE_COLUMNS_RESTRICTION_CONDITIONS = [
+        "TABLE_NAME = 'User' AND (COLUMN_NAME = 'password_hash' OR COLUMN_NAME = 'email')"
+    ]
     if auth.verify_admin_authentication(credentials.username, credentials.password):
         if table_name in ADMIN_AUTHORIZED_TABLES_NAMES:
             with pymysql.connect(**DB_CONNECT_CONFIG) as conn:
                 with conn.cursor() as cursor:
                     cursor.execute(
-                        """SELECT
+                        f"""SELECT
                             COLUMN_NAME,
                             DATA_TYPE
                         FROM
                             INFORMATION_SCHEMA.COLUMNS
                         WHERE
                             TABLE_SCHEMA = %s AND TABLE_NAME = %s
-                            AND NOT (TABLE_NAME = 'User' AND (COLUMN_NAME = 'password_hash' OR COLUMN_NAME = 'email'));
+                            {'\n'.join([f'AND NOT ({cond})' for cond in PRIVATE_COLUMNS_RESTRICTION_CONDITIONS])};
                         """,
                         (
                             DB_CONNECT_CONFIG["database"],
@@ -95,6 +100,9 @@ async def view_table(
                     results = (
                         cursor.fetchall()
                     )  # Fetches all results as a list of tuples
-                return json.dumps({"columns": columns_infos, "rows": results}, indent=4)
+                return Response(
+                    json.dumps({"columns": columns_infos, "rows": results}),
+                    media_type="application/json",
+                )
 
     raise auth.UNAUTHORIZED_RESPONSE
