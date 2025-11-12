@@ -82,10 +82,15 @@ async def view_table(
                     )
                     columns_infos = []
                     reflection_result = cursor.fetchall()
-                    for column_info in reflection_result:
-                        columns_infos.append(column_info)
+                    for unlabeled_column_info in reflection_result:
+                        columns_infos.append(
+                            {
+                                "name": unlabeled_column_info[0],
+                                "data_type": unlabeled_column_info[1],
+                            }
+                        )
 
-                    sql = f"SELECT {','.join(f'`{col['COLUMN_NAME']}`' for col in columns_infos)} FROM {table_name};"
+                    sql = f"SELECT {','.join(f'`{col['name']}`' for col in columns_infos)} FROM {table_name};"
                     cursor.execute(sql)
                     results = (
                         cursor.fetchall()
