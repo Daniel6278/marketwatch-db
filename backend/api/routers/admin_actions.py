@@ -59,6 +59,13 @@ async def list_tables(
             json.dumps(ADMIN_AUTHORIZED_TABLES_NAMES), media_type="application/json"
         )
 
+class CustomEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return obj.isoformat()  # Convert datetime to ISO 8601 string
+        if isinstance(obj, Decimal):
+            return float(obj)  # Convert Decimal to float
+        return json.JSONEncoder.default(self, obj) # Let the base class handle other types
 
 @router.get("/table/{table_name}", tags=["admin"])
 async def view_table(
@@ -120,7 +127,7 @@ async def view_table(
                         cursor.fetchall()
                     )  # Fetches all results as a list of tuples
                 return Response(
-                    json.dumps({"columns": columns_infos, "rows": results}, default=float),
+                    json.dumps({"columns": columns_infos, "rows": results}, cls=CustomEncoder),
                     media_type="application/json",
                 )
 
