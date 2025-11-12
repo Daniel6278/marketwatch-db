@@ -3,7 +3,7 @@ import pandas as pd
 from hashlib import sha256
 import base64
 
-N_INSTANCES = 5
+N_INSTANCES = 10
 
 # Create a Faker instance (default locale is en_US)
 fake = Faker()

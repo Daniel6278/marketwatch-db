@@ -1,3 +1,5 @@
+""" """
+
 import os, pymysql
 import pandas as pd
 from dotenv import load_dotenv
@@ -20,9 +22,14 @@ if __name__ == "__main__":
         "Alert",
         "Ticker",
         "PriceHistory",
+        "Portfolio",
+        "Holdings",
+        "User",
     }
 
-    batch_size = 5
+    ROWS_LIMIT = 1000
+
+    BATCH_SIZE = 100
 
     with pymysql.connect(**DB_CONNECT_CONFIG) as conn:
         print("connected")
@@ -46,8 +53,9 @@ if __name__ == "__main__":
 
                 colnames = []
 
+                # fetches columns names
                 while True:
-                    rows = cursor.fetchmany(size=batch_size)
+                    rows = cursor.fetchmany(size=BATCH_SIZE)
                     if not rows:  # Breaks the loop if no more rows are returned
                         break
 
@@ -61,16 +69,21 @@ if __name__ == "__main__":
 
                 cursor.execute(f"SELECT {','.join(colnames)} FROM %s;" % tname)
 
-                i = 0
-                while True:
-                    rows = cursor.fetchmany(size=batch_size)
+                n_rows_processed_current_table = 0
+                while n_rows_processed_current_table < ROWS_LIMIT:
+                    rows = cursor.fetchmany(size=BATCH_SIZE)
                     if not rows:  # Breaks the loop if no more rows are returned
                         break
+                    n_rows_processed_current_table += len(rows)
+
+                    # hard limit
+                    if n_rows_processed_current_table > ROWS_LIMIT:
+                        rows = rows[: -(n_rows_processed_current_table - ROWS_LIMIT)]
 
                     for row in rows:
-                        print(row)
-                        df.loc[i] = row
-                        i += 1
+                        # print(row)
+                        df.loc[n_rows_processed_current_table] = row
+                        n_rows_processed_current_table += 1
 
                 print(df.info())
 

@@ -10,7 +10,7 @@ from ..internal.setup_db import setup_db, db_fill_starter_data
 from ..internal import auth
 from ..dependencies import DB_CONNECT_CONFIG
 
-import json, pymysql
+import json, pymysql, datetime, decimal
 
 from collections import defaultdict
 
@@ -59,13 +59,17 @@ async def list_tables(
             json.dumps(ADMIN_AUTHORIZED_TABLES_NAMES), media_type="application/json"
         )
 
+
 class CustomEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, datetime):
-            return obj.isoformat()  # Convert datetime to ISO 8601 string
-        if isinstance(obj, Decimal):
-            return float(obj)  # Convert Decimal to float
-        return json.JSONEncoder.default(self, obj) # Let the base class handle other types
+    def default(self, o):
+        if isinstance(o, datetime.datetime):
+            return o.isoformat()  # Convert datetime to ISO 8601 string
+        if isinstance(o, decimal.Decimal):
+            return float(o)  # Convert Decimal to float
+        return json.JSONEncoder.default(
+            self, o
+        )  # Let the base class handle other types
+
 
 @router.get("/table/{table_name}", tags=["admin"])
 async def view_table(
@@ -127,7 +131,9 @@ async def view_table(
                         cursor.fetchall()
                     )  # Fetches all results as a list of tuples
                 return Response(
-                    json.dumps({"columns": columns_infos, "rows": results}, cls=CustomEncoder),
+                    json.dumps(
+                        {"columns": columns_infos, "rows": results}, cls=CustomEncoder
+                    ),
                     media_type="application/json",
                 )
 
