@@ -192,7 +192,7 @@ async def check_db_size(
                     # Get total database size
                     cursor.execute(
                         f_sql_check_db_size.read(),
-                        (DB_CONNECT_CONFIG["database"],),
+                        {"db_name": DB_CONNECT_CONFIG["database"]},
                     )
 
                 db_size = cursor.fetchone()[0]
