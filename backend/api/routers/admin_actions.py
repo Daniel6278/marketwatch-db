@@ -164,7 +164,7 @@ async def check_db_size(
                     # Gets size of each table
                     cursor.execute(
                         f_sql_check_tables_sizes.read(),
-                        (DB_CONNECT_CONFIG["database"],),
+                        {"db_name": DB_CONNECT_CONFIG["database"]},
                     )
 
                 print("=" * 60, file=response_text)
