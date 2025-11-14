@@ -4,6 +4,9 @@ from ..dependencies import DB_CONNECT_CONFIG
 
 import pymysql
 
+from hashlib import sha256
+import base64
+
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
@@ -32,9 +35,19 @@ ADMIN_FORBIDDEN_RESPONSE = HTTPException(
 )
 
 
+def credentials_b64(username_no_colon, password_hash):
+    return base64.b64encode(
+        (username_no_colon + ":" + password_hash).encode("utf-8")
+    ).decode("utf-8")
+
+
+def hash_password(password: str):
+    return base64.b64encode(sha256(password.encode("utf-8")).digest()).decode("utf-8")
+
+
 def verify_user_authentication(user_id: str, password_hash: str):
     with pymysql.connect(**DB_CONNECT_CONFIG) as conn, open(
-        "api/sql/ops/authenticate_user.sql", "r"
+        "api/sql/crud_ops/read/authenticate_user.sql", "r"
     ) as query:
         cursor = conn.cursor()
         cursor.execute(

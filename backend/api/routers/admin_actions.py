@@ -159,7 +159,7 @@ async def check_db_size(
         with pymysql.connect(**DB_CONNECT_CONFIG) as conn:
             with conn.cursor() as cursor:
                 with open(
-                    "api/sql/ops/check_tables_sizes.sql", "r"
+                    "api/sql/crud_ops/read/check_tables_sizes.sql", "r"
                 ) as f_sql_check_tables_sizes:
                     # Gets size of each table
                     cursor.execute(
@@ -188,7 +188,9 @@ async def check_db_size(
                 print(f"{'TOTAL':<20} {total_size:>10.2f} MB", file=response_text)
                 print("=" * 60, file=response_text)
 
-                with open("api/sql/ops/check_db_size.sql", "r") as f_sql_check_db_size:
+                with open(
+                    "api/sql/crud_ops/read/check_db_size.sql", "r"
+                ) as f_sql_check_db_size:
                     # Get total database size
                     cursor.execute(
                         f_sql_check_db_size.read(),

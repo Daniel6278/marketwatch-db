@@ -5,7 +5,7 @@ from ..dependencies import DB_CONNECT_CONFIG
 
 def setup_db():
     with pymysql.connect(**DB_CONNECT_CONFIG) as conn, open(
-        "api/sql/ops/drop_all.sql", "r"
+        "api/sql/crud_ops/delete/drop_all.sql", "r"
     ) as sql_drop_all, open(
         "api/sql/schema/create_tables.sql", "r"
     ) as sql_create_tables, open(
