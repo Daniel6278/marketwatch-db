@@ -1,63 +1,87 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from "react-router-dom";
+import { useContext } from "react";
 import {
   NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuIndicator,
+  NavigationMenuList,
   NavigationMenuItem,
   NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  NavigationMenuViewport,
-} from "../components/ui/navigation-menu"
-
-// Consume the Context in Components
-import { useContext } from 'react';
-import { UserContext } from '../context/UserContext';
-import { GlobalModalDialogContext } from '../context/GlobalModalDialogContext';
-
-import { useLocation } from 'react-router-dom';
+} from "../components/ui/navigation-menu";
+import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
+import { UserContext } from "../context/UserContext";
+import { GlobalModalDialogContext } from "../context/GlobalModalDialogContext";
 
 function GlobalNavBar() {
   const location = useLocation();
-
-    const currentUser = useContext(UserContext);
-    const signInDialog = useContext(GlobalModalDialogContext);
+  const currentUser = useContext(UserContext);
+  const signInDialog = useContext(GlobalModalDialogContext);
 
   return (
     <NavigationMenu>
-    <NavigationMenuList>
+      <NavigationMenuList>
+        {/* MarketWatch */}
         <NavigationMenuItem>
-        <NavigationMenuLink asChild>
-            <Link to="/" className="text-primary-foreground">MarketWatch</Link>
-        </NavigationMenuLink>
-        </NavigationMenuItem>
-        <NavigationMenuItem>
-        <NavigationMenuLink asChild>
-            <Link to="/tickers" className="text-primary-foreground">Tickers</Link>
-        </NavigationMenuLink>
-        </NavigationMenuItem>
-        <NavigationMenuItem>
-        <NavigationMenuLink asChild>
-            <Link to="/admin" className="text-primary-foreground">Admin</Link>
-        </NavigationMenuLink>
+          <NavigationMenuLink asChild>
+            <Link
+              to="/"
+              className={navigationMenuTriggerStyle({ className: "!text-foreground" })}
+            >
+              MarketWatch
+            </Link>
+          </NavigationMenuLink>
         </NavigationMenuItem>
 
-        {currentUser?.user ? (
+        {/* Tickers */}
         <NavigationMenuItem>
-        <NavigationMenuLink asChild>
-            <Link to="/me" className="text-primary-foreground">My Account</Link>
-        </NavigationMenuLink>
-        </NavigationMenuItem>) : (
-        
-        !location.pathname.includes('/admin') ? (
-        <NavigationMenuItem onClick={()=>signInDialog?.openDialog()}>
-            <NavigationMenuLink>
-                Log In
-            </NavigationMenuLink>
+          <NavigationMenuLink asChild>
+            <Link
+              to="/tickers"
+              className={navigationMenuTriggerStyle({ className: "!text-foreground" })}
+            >
+              Tickers
+            </Link>
+          </NavigationMenuLink>
         </NavigationMenuItem>
-        ) : (undefined)
-    )}
-    </NavigationMenuList>
+
+        {/* Admin */}
+        <NavigationMenuItem>
+          <NavigationMenuLink asChild>
+            <Link
+              to="/admin"
+              className={navigationMenuTriggerStyle({ className: "!text-foreground" })}
+            >
+              Admin
+            </Link>
+          </NavigationMenuLink>
+        </NavigationMenuItem>
+
+        {/* User-specific links */}
+        {currentUser?.user ? (
+          <NavigationMenuItem>
+            <NavigationMenuLink asChild>
+              <Link
+                to="/me"
+                className={navigationMenuTriggerStyle({ className: "text-foreground" })}
+              >
+                My Account
+              </Link>
+            </NavigationMenuLink>
+          </NavigationMenuItem>
+        ) : (
+          !location.pathname.includes("/admin") && (
+            <NavigationMenuItem>
+              <NavigationMenuLink asChild>
+                <button
+                  type="button"
+                  className={navigationMenuTriggerStyle({ className: "text-foreground" })}
+                  onClick={() => signInDialog?.openDialog()}
+                >
+                  Log In
+                </button>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+          )
+        )}
+      </NavigationMenuList>
     </NavigationMenu>
   );
 }
