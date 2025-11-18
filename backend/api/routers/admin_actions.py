@@ -5,7 +5,7 @@ from fastapi_pagination import Page, Params
 
 from fastapi import APIRouter, Header, status, HTTPException, Depends
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from starlette.responses import Response
+from starlette.responses import Response, PlainTextResponse
 
 from ..internal.setup_db import setup_db, db_fill_starter_data
 from ..internal import auth
@@ -155,7 +155,7 @@ async def view_table(
     return auth.basic_admin_auth_wrapper(credentials, _task)
 
 
-@router.get("/metrics/storage", tags=["admin"])
+@router.get("/metrics/storage", response_class=PlainTextResponse, tags=["admin"])
 async def check_db_size(
     credentials: Annotated[HTTPBasicCredentials, Depends(auth.security)],
 ):
