@@ -103,7 +103,12 @@ async def signin(
         queried_user_id = query_results[0]
 
         if is_auth_successful:
-            return auth.credentials_b64(str(queried_user_id), password_hash)
+            return auth.user_state_json_dict(
+                id=queried_user_id,
+                credentials_encoded=auth.credentials_b64(
+                    str(queried_user_id), password_hash
+                ),
+            )
 
         raise auth.UNAUTHORIZED_RESPONSE
 

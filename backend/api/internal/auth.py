@@ -87,3 +87,10 @@ def basic_admin_auth_wrapper(credentials, callback):
             return callback()
         raise ADMIN_FORBIDDEN_RESPONSE
     raise ADMIN_UNAUTHORIZED_RESPONSE
+
+
+def user_state_json_dict(id: int, credentials_encoded: str):
+    return {
+        "id": id,
+        "credentials": credentials_encoded,
+    }

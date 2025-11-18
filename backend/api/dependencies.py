@@ -40,5 +40,5 @@ def get_logger(name: str = "fastapi-app") -> logging.Logger:
 
 
 def pagination_augment(params: Params):
-    params.start = (params.page - 1) * params.size
+    params.start = (params.page - 1) * params.size  # type: ignore
     return params

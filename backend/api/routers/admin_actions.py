@@ -141,7 +141,7 @@ async def view_table(
 
                 sql = f"""SELECT {','.join(f'`{col['name']}`' for col in columns_infos)} FROM {table_name}
                     LIMIT %d OFFSET %d;"""
-                cursor.execute(sql, (pagination_params.size, pagination_params.start))
+                cursor.execute(sql, (pagination_params.size, pagination_params.start))  # type: ignore
                 results = cursor.fetchall()  # Fetches all results as a list of tuples
 
         return Response(
@@ -211,3 +211,19 @@ async def check_db_size(
         return response_text.getvalue()
 
     return auth.basic_admin_auth_wrapper(credentials, _task)
+
+
+@router.post("/signin", tags=["admin"])
+async def signin(
+    username: str,
+    password: str,
+    logger: logging.Logger = Depends(get_logger),
+):
+    if auth.verify_admin_authentication(username, password):
+        logger.info("admin login successful")
+        return auth.user_state_json_dict(
+            id=-1,
+            credentials_encoded=auth.credentials_b64(username, password),
+        )
+
+    raise auth.UNAUTHORIZED_RESPONSE
