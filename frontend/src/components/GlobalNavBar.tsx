@@ -15,8 +15,12 @@ import { useContext } from 'react';
 import { UserContext } from '../context/UserContext';
 import { GlobalModalDialogContext } from '../context/GlobalModalDialogContext';
 
+import { useLocation } from 'react-router-dom';
+
 function GlobalNavBar() {
-    const user = useContext(UserContext);
+  const location = useLocation();
+
+    const currentUser = useContext(UserContext);
     const signInDialog = useContext(GlobalModalDialogContext);
 
   return (
@@ -24,27 +28,35 @@ function GlobalNavBar() {
     <NavigationMenuList>
         <NavigationMenuItem>
         <NavigationMenuLink asChild>
-            <Link to="/">MarketWatch</Link>
+            <Link to="/" className="text-primary-foreground">MarketWatch</Link>
         </NavigationMenuLink>
         </NavigationMenuItem>
         <NavigationMenuItem>
         <NavigationMenuLink asChild>
-            <Link to="/tickers">Tickers</Link>
+            <Link to="/tickers" className="text-primary-foreground">Tickers</Link>
         </NavigationMenuLink>
         </NavigationMenuItem>
         <NavigationMenuItem>
         <NavigationMenuLink asChild>
-            <Link to="/admin">Admin</Link>
+            <Link to="/admin" className="text-primary-foreground">Admin</Link>
         </NavigationMenuLink>
         </NavigationMenuItem>
 
-        {user ? <NavigationMenuItem>
+        {currentUser?.user ? (
+        <NavigationMenuItem>
         <NavigationMenuLink asChild>
-            <Link to="/me">My Account</Link>
+            <Link to="/me" className="text-primary-foreground">My Account</Link>
         </NavigationMenuLink>
-        </NavigationMenuItem> : <NavigationMenuItem onClick={()=>signInDialog?.openDialog()}>
-            Log In
-        </NavigationMenuItem>}
+        </NavigationMenuItem>) : (
+        
+        !location.pathname.includes('/admin') ? (
+        <NavigationMenuItem onClick={()=>signInDialog?.openDialog()}>
+            <NavigationMenuLink>
+                Log In
+            </NavigationMenuLink>
+        </NavigationMenuItem>
+        ) : (undefined)
+    )}
     </NavigationMenuList>
     </NavigationMenu>
   );

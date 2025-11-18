@@ -17,10 +17,12 @@ export const GlobalModalDialogProvider = ({ children }: { children: React.ReactN
     });
 
     const openDialog = () => {
+        console.log("open dialog");
         setDialogState({ isOpen: true });
     };
 
     const closeDialog = () => {
+        console.log("close dialog");
         setDialogState({ isOpen: false });
     };
 

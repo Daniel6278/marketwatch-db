@@ -1,5 +1,5 @@
 
-class User {
+export class UserIdentifier {
     userId: string;
     httpCredentials: string;
 
@@ -13,8 +13,8 @@ class User {
 import { createContext, useState } from 'react';
 
 interface UserContextType {
-  user: User | null;
-  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  user: UserIdentifier | null;
+  setUser: React.Dispatch<React.SetStateAction<UserIdentifier | null>>;
 }
 
 export const UserContext = createContext<UserContextType | null>(null);
@@ -23,7 +23,7 @@ export const UserContext = createContext<UserContextType | null>(null);
 import type { ReactNode } from 'react';
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null); // Example global state
+  const [user, setUser] = useState<UserIdentifier | null>(null); // Example global state
 
   return (
     <UserContext.Provider value={{ user, setUser }}>
