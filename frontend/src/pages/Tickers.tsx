@@ -10,9 +10,9 @@ import {
   TableRow,
 } from "../components/ui/table";
 import { Input } from "../components/ui/input";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-import { API_HOST } from '../App';
+import { API_ORIGIN } from '../App';
 
 interface Ticker {
     tickerSymbol: string;
@@ -29,7 +29,7 @@ function Tickers() {
         const params = new URLSearchParams({
             'search_query': searchBarValue
         });
-        const url = `${API_HOST}/tickers${searchBarValue && searchBarValue.length ? ('?' + params.toString()) : ''}`;
+        const url = `${API_ORIGIN}/tickers${searchBarValue && searchBarValue.length ? ('?' + params.toString()) : ''}`;
         try {
             const response = await fetch(url);
             if (!response.ok) {
@@ -42,6 +42,10 @@ function Tickers() {
             console.error('Error fetching data:', error);
         }
     }
+
+    useEffect(() => {
+        queryTickers();
+    }, []); // The empty dependency array ensures this effect runs only once on mount
 
     function onSearchBarChange(event: React.ChangeEvent<HTMLInputElement>) {
         setSearchBarValue((event.target as HTMLInputElement)?.value);

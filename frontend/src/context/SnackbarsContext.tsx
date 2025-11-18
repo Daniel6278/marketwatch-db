@@ -4,14 +4,14 @@ import React, { createContext, useContext, useState } from "react";
 class Snackbar {
     id: string;
     message: string;
-    request: string;
+    requestPayload: string | null;
     response: string;
     sql: string | null;
 
-    constructor(message: string, request: string, response: string, sql: string | null) {
+    constructor(message: string, request: string | null, response: string, sql: string | null) {
         this.id = crypto.randomUUID();
         this.message = message;
-        this.request = request;
+        this.requestPayload = request;
         this.response = response;
         this.sql = sql;
     }

@@ -8,7 +8,7 @@ import AdminDashboard from './pages/admin/Dashboard';
 import Landing from './pages/Landing';
 import GlobalNavBar from './components/GlobalNavBar';
 
-export const API_HOST = "https://specific-brande-data-group-585a3e34.koyeb.app";
+export const API_ORIGIN = "https://specific-brande-data-group-585a3e34.koyeb.app";
 
 import { Button } from "./components/ui/button"
 import {

@@ -13,6 +13,7 @@
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
+    "emitDeclarationOnly": true,
 
     /* Linting */
     "strict": true,
