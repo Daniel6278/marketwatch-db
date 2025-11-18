@@ -7,7 +7,7 @@ import pymysql
 from hashlib import sha256
 import base64
 
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import HTTPException, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
 security = HTTPBasic()
@@ -85,5 +85,5 @@ def basic_admin_auth_wrapper(credentials, callback):
     if credentials.username and credentials.password:
         if verify_admin_authentication(credentials.username, credentials.password):
             return callback()
-        return ADMIN_FORBIDDEN_RESPONSE
-    return ADMIN_UNAUTHORIZED_RESPONSE
+        raise ADMIN_FORBIDDEN_RESPONSE
+    raise ADMIN_UNAUTHORIZED_RESPONSE

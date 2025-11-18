@@ -2,7 +2,7 @@ from typing import Annotated
 
 from ..internal import auth
 from ..internal.demo_assignment import sql_code_return_wrapper
-from ..dependencies import DB_CONNECT_CONFIG, BAD_REQUEST_RESPONSE
+from ..dependencies import DB_CONNECT_CONFIG, BAD_REQUEST_RESPONSE, DatabaseError
 
 from fastapi import APIRouter, Header, status, HTTPException, Depends
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
@@ -46,37 +46,36 @@ async def register_new_user(
         len(email) > 0 and len(email) <= 255 and is_valid_email_addr(email),
         len(password) > 0 and len(password) <= 60,
     ]
-    if all(CONSTRAINTS):
-        password_hash = auth.hash_password(password)
-        try:
-            with pymysql.connect(**DB_CONNECT_CONFIG) as conn:
-                with conn.cursor() as cursor:
-                    with open(
-                        "api/sql/crud_ops/create_a_user.sql", "r"
-                    ) as f_sql_create_a_user:
-                        cursor.execute(
-                            f_sql_create_a_user.read(),
-                            {
-                                "first_name": first_name,
-                                "last_name": last_name,
-                                "email": email,
-                                "password_hash": password_hash,
-                            },
-                        )
+    if not all(CONSTRAINTS):
+        return BAD_REQUEST_RESPONSE
+    password_hash = auth.hash_password(password)
+    try:
+        with pymysql.connect(**DB_CONNECT_CONFIG) as conn:
+            with conn.cursor() as cursor:
+                with open(
+                    "api/sql/crud_ops/create_a_user.sql", "r"
+                ) as f_sql_create_a_user:
+                    cursor.execute(
+                        f_sql_create_a_user.read(),
+                        {
+                            "first_name": first_name,
+                            "last_name": last_name,
+                            "email": email,
+                            "password_hash": password_hash,
+                        },
+                    )
 
-                    cursor.execute("SELECT LAST_INSERT_ID() AS created_user_id;")
-                    (created_user_id,) = cursor.fetchone()
+                cursor.execute("SELECT LAST_INSERT_ID() AS created_user_id;")
+                (created_user_id,) = cursor.fetchone()
 
-                    conn.commit()
+                conn.commit()
 
-            return auth.credentials_b64(str(created_user_id), password_hash)
-        except:
-            return Response(
-                "failed to create user account",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
-
-    return BAD_REQUEST_RESPONSE
+        return auth.credentials_b64(str(created_user_id), password_hash)
+    except:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="failed to create user account",
+        )
 
 
 @router.post("/signin", tags=["users"])
@@ -106,13 +105,10 @@ async def signin(
         if is_auth_successful:
             return auth.credentials_b64(str(queried_user_id), password_hash)
 
-        return auth.UNAUTHORIZED_RESPONSE
+        raise auth.UNAUTHORIZED_RESPONSE
 
     except:
-        return Response(
-            "database error",
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
+        raise DatabaseError("user_sign_in.sql")
 
 
 @router.get("/me", tags=["users"])
@@ -124,7 +120,7 @@ async def user_me_shortcut(
             url=f"/users/{user_id}", status_code=status.HTTP_302_FOUND
         )
 
-    return auth.UNAUTHORIZED_RESPONSE
+    raise auth.UNAUTHORIZED_RESPONSE
 
 
 @router.get("/users/{id}", tags=["users"])
@@ -159,9 +155,9 @@ async def user_profile_details(
                 "member_since": query_result__member_since,
             }
 
-        return auth.FORBIDDEN_RESPONSE
+        raise auth.FORBIDDEN_RESPONSE
 
-    return auth.UNAUTHORIZED_RESPONSE
+    raise auth.UNAUTHORIZED_RESPONSE
 
 
 @router.get("/users/{id}/portfolios", tags=["users"])
@@ -174,9 +170,9 @@ async def user_portfolios_basic_info(
         if id == logged_in_user_id:
             return {"user_id": id}  # TODO
 
-        return auth.FORBIDDEN_RESPONSE
+        raise auth.FORBIDDEN_RESPONSE
 
-    return auth.UNAUTHORIZED_RESPONSE
+    raise auth.UNAUTHORIZED_RESPONSE
 
 
 @router.get("/users/{id}/portfolios/holdings", tags=["users"])
@@ -188,9 +184,9 @@ async def user_portfolios_and_contained_holdings(
         if id == logged_in_user_id:
             return {"user_id": id}  # TODO
 
-        return auth.FORBIDDEN_RESPONSE
+        raise auth.FORBIDDEN_RESPONSE
 
-    return auth.UNAUTHORIZED_RESPONSE
+    raise auth.UNAUTHORIZED_RESPONSE
 
 
 @router.post("/users/{id}/portfolios/new", tags=["users"])
@@ -240,8 +236,8 @@ async def create_portfolio(
                         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     )
 
-            return BAD_REQUEST_RESPONSE  # constraints violated
+            raise BAD_REQUEST_RESPONSE  # constraints violated
 
-        return auth.FORBIDDEN_RESPONSE  # not you
+        raise auth.FORBIDDEN_RESPONSE  # not you
 
-    return auth.UNAUTHORIZED_RESPONSE  # user is not logged-in
+    raise auth.UNAUTHORIZED_RESPONSE  # user is not logged-in
