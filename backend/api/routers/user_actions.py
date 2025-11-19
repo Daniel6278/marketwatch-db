@@ -15,7 +15,7 @@ from starlette.responses import RedirectResponse, Response
 
 import pymysql, re, logging
 
-from admin_actions import GENERIC_ADMIN_USER_ID
+from ..routers.admin_actions import GENERIC_ADMIN_USER_ID
 
 router = APIRouter()
 
