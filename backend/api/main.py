@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .dependencies import DB_CONNECT_CONFIG
 from .internal import setup_db
-from .routers import admin_actions, user_actions, tests
+from .routers import admin_actions, user_actions, tests, public_actions
 
 app = FastAPI()
 
@@ -25,6 +25,10 @@ app.add_middleware(
 add_pagination(app)
 
 app.include_router(tests.router)
+app.include_router(
+    public_actions.router,
+    tags=["public"],
+)
 app.include_router(
     admin_actions.router,
     prefix="/admin",
