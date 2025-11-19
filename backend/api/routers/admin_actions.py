@@ -227,7 +227,7 @@ async def signin(
 
 GENERIC_ADMIN_USER_ID = -1
 
-@router.put("/me", tags=["admin"])
+@router.get("/me", tags=["admin"])
 async def admin_frontend_user_info(
     credentials: Annotated[HTTPBasicCredentials, Depends(auth.security)],
     logger: logging.Logger = Depends(get_logger),
