@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 from fastapi import Depends, FastAPI
-from fastapi_pagination import add_pagination, Page, Params
+from fastapi_pagination import add_pagination
 from fastapi.middleware.cors import CORSMiddleware
 
 from .dependencies import DB_CONNECT_CONFIG

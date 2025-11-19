@@ -1,6 +1,5 @@
 import os
 from fastapi import Depends, FastAPI, HTTPException, status
-from fastapi_pagination import Page, Params
 
 import logging
 from functools import lru_cache
@@ -37,8 +36,3 @@ logging.basicConfig(
 @lru_cache()  # Cache the logger instance for performance
 def get_logger(name: str = "fastapi-app") -> logging.Logger:
     return logging.getLogger(name)
-
-
-def pagination_augment(params: Params = Depends()):
-    params.start = (params.page - 1) * params.size  # type: ignore
-    return params

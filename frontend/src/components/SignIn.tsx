@@ -2,7 +2,14 @@ import React from "react";
 import { useForm, Controller } from "react-hook-form";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "../components/ui/form";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "../components/ui/form";
 import { Link } from "react-router-dom";
 
 interface LoginProps {
@@ -34,7 +41,6 @@ const SignIn: React.FC<LoginProps> = ({ onLogin }) => {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-          
           <FormField
             control={form.control}
             name="email"
@@ -42,7 +48,11 @@ const SignIn: React.FC<LoginProps> = ({ onLogin }) => {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input type="email" placeholder="you@example.com" {...field} />
+                  <Input
+                    type="email"
+                    placeholder="you@example.com"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

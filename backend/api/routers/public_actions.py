@@ -8,10 +8,10 @@ from fastapi import (
     Body,
     Query,
 )
-from fastapi_pagination import Page, Params
+from fastapi_pagination import LimitOffsetParams, Params
 import pymysql
 
-from ..dependencies import DB_CONNECT_CONFIG, pagination_augment
+from ..dependencies import DB_CONNECT_CONFIG
 
 router = APIRouter()
 
@@ -19,8 +19,9 @@ router = APIRouter()
 @router.get("/tickers", tags=["public"])
 async def tickers_overview(
     search_query: str | None = Query(None),
-    pagination_params: Params = Depends(pagination_augment),
+    pagination_params: LimitOffsetParams = Depends(),
 ):
+    MAX_PAGE_SIZE = 100
     if search_query is None:
         search_query = ""
     search_query = search_query.strip().lower()
@@ -34,8 +35,8 @@ async def tickers_overview(
                     cursor.execute(
                         f_sql_overview_tickers.read(),
                         {
-                            "offset": pagination_params.start,  # type: ignore
-                            "limit": pagination_params.size,
+                            "offset": pagination_params.offset,  # type: ignore
+                            "limit": pagination_params.limit,
                             "starts_with": search_query,
                         },
                     )

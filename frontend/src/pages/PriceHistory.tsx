@@ -1,7 +1,5 @@
 function PriceHistory() {
-  return (
-    <div></div>
-  );
+  return <div></div>;
 }
 
 export default PriceHistory;

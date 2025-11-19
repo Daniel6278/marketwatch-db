@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Body
-from fastapi_pagination import Page, Params
+from fastapi_pagination import LimitOffsetPage, Params, LimitOffsetParams
 
 from fastapi import APIRouter, Header, status, HTTPException, Depends
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
@@ -9,7 +9,7 @@ from starlette.responses import Response, PlainTextResponse
 
 from ..internal.setup_db import setup_db, db_fill_starter_data
 from ..internal import auth
-from ..dependencies import DB_CONNECT_CONFIG, get_logger, pagination_augment
+from ..dependencies import DB_CONNECT_CONFIG, get_logger
 
 import json, pymysql, datetime, decimal, io, logging
 
@@ -76,11 +76,11 @@ class MysqlDataTypesJsonCompatableEncoder(json.JSONEncoder):
         )  # Let the base class handle other types
 
 
-@router.get("/table/{table_name}", response_model=Page[dict], tags=["admin"])
+@router.get("/table/{table_name}", tags=["admin"])
 async def view_table(
     credentials: Annotated[HTTPBasicCredentials, Depends(auth.security)],
     table_name: str,
-    pagination_params: Params = Depends(pagination_augment),
+    pagination_params: LimitOffsetParams = Depends(),
 ):
     def _task():
         MAX_PAGE_SIZE = 100
@@ -89,7 +89,7 @@ async def view_table(
         ]
         if not (
             table_name in ADMIN_AUTHORIZED_TABLES_NAMES
-            and pagination_params.size < MAX_PAGE_SIZE
+            and pagination_params.limit < MAX_PAGE_SIZE
         ):
             raise (
                 auth.FORBIDDEN_RESPONSE
@@ -141,7 +141,7 @@ async def view_table(
 
                 sql = f"""SELECT {','.join(f'`{col['name']}`' for col in columns_infos)} FROM {table_name}
                     LIMIT %d OFFSET %d;"""
-                cursor.execute(sql, (pagination_params.size, pagination_params.start))  # type: ignore
+                cursor.execute(sql, (pagination_params.limit, pagination_params.offset))  # type: ignore
                 results = cursor.fetchall()  # Fetches all results as a list of tuples
 
         return Response(

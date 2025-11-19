@@ -43,8 +43,7 @@ export default function GlobalNavBar() {
     { to: "/admin", label: "Admin" },
   ];
 
-  const shouldShowLogin =
-    !user && !location.pathname.includes("/admin");
+  const shouldShowLogin = !user && !location.pathname.includes("/admin");
 
   return (
     <>
@@ -55,41 +54,41 @@ export default function GlobalNavBar() {
             <NavItem
               key={to}
               to={to}
-              className={"cursor-pointer !text-foreground " + (bold ? "!font-bold" : "")}
+              className={
+                "cursor-pointer !text-foreground " + (bold ? "!font-bold" : "")
+              }
             >
               {label}
             </NavItem>
           ))}
 
           {/* User-specific items */}
-          {user ? (
-            !user.isAdmin() && <NavItem to="/me">My Account</NavItem>
-          ) : (
-            shouldShowLogin && (
-              <NavigationMenuItem>
-                <NavigationMenuLink asChild>
-                  <button
-                    type="button"
-                    className={navigationMenuTriggerStyle({
-                      className: "!text-foreground",
-                    })}
-                    onClick={() => signInDialog?.openDialog()}
-                  >
-                    Log In
-                  </button>
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-            )
-          )}
+          {user
+            ? !user.isAdmin() && <NavItem to="/me">My Account</NavItem>
+            : shouldShowLogin && (
+                <NavigationMenuItem>
+                  <NavigationMenuLink asChild>
+                    <button
+                      type="button"
+                      className={navigationMenuTriggerStyle({
+                        className: "!text-foreground",
+                      })}
+                      onClick={() => signInDialog?.openDialog()}
+                    >
+                      Log In
+                    </button>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+              )}
         </NavigationMenuList>
       </NavigationMenu>
 
-      {user &&
-      <div className="float-right rounded grid grid-rows-2 cursor-pointer">
-        <span>Signed in as:</span>
-        <em>{user?.displayName}</em>
-      </div>
-      }
+      {user && (
+        <div className="float-right rounded grid grid-rows-2 cursor-pointer">
+          <span>Signed in as:</span>
+          <em>{user?.displayName}</em>
+        </div>
+      )}
 
       <hr className="mt-3 mb-5" />
     </>

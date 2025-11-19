@@ -13,7 +13,7 @@ import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { apiCall } from "@/App";
 
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import { UserContext, FrontendUser } from "@/context/ActiveUserContext";
 import { ActionFeedbackToastsContext } from "@/context/ActionFeedbackToastsContext";
 
@@ -51,23 +51,36 @@ const CreateAccount: React.FC = () => {
       return;
     }
 
-    apiCall(activeUserContext, actionFeedbackToastsContext, {
-      endpoint: 'register',
-      method: 'POST',
-      params: {
-        'first_name': values.firstName,
-        'last_name': values.lastName,
-        'email': values.email,
-        'password': values.password,
+    apiCall(
+      activeUserContext,
+      actionFeedbackToastsContext,
+      {
+        endpoint: "register",
+        method: "POST",
+        params: {
+          first_name: values.firstName,
+          last_name: values.lastName,
+          email: values.email,
+          password: values.password,
+        },
       },
-    }, (credentials) => {
-      activeUserContext.setUser(new FrontendUser(credentials, activeUserContext, actionFeedbackToastsContext));
-      form.reset();
-      navigate('/me');
-    }, true, {
-      successFeedbackMessage: "Account created.",
-      failureFeedbackMessage: "Failed to create account.",
-    });
+      (credentials) => {
+        activeUserContext.setUser(
+          new FrontendUser(
+            credentials,
+            activeUserContext,
+            actionFeedbackToastsContext
+          )
+        );
+        form.reset();
+        navigate("/me");
+      },
+      true,
+      {
+        successFeedbackMessage: "Account created.",
+        failureFeedbackMessage: "Failed to create account.",
+      }
+    );
   };
 
   return (
@@ -122,7 +135,11 @@ const CreateAccount: React.FC = () => {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input type="email" placeholder="you@example.com" {...field} />
+                  <Input
+                    type="email"
+                    placeholder="you@example.com"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
