@@ -17,10 +17,10 @@ export class FrontendUser {
     apiCall(
       activeUserContext,
       actionFeedbackToastsContext,
-      { endpoint: "get-user-frontend-info", method: "GET" },
-      ({ id, displayName }) => {
-        this.userId = id;
-        this.displayName = displayName;
+      { endpoint: "me", method: "GET" },
+      ({ user_id, first_name }) => {
+        this.userId = user_id;
+        this.displayName = first_name;
       },
       false
     );

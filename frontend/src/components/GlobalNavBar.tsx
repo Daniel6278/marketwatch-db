@@ -8,7 +8,10 @@ import {
 } from "../components/ui/navigation-menu";
 import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
 import { UserContext } from "../context/ActiveUserContext";
-import { useSignInDialog } from "../context/GlobalModalDialogsStatesContext";
+import {
+  useSignInDialog,
+  useSignOutDialog,
+} from "../context/GlobalModalDialogsStatesContext";
 
 function NavItem({
   to,
@@ -34,6 +37,11 @@ export default function GlobalNavBar() {
   const { user } = useContext(UserContext) || {};
   const location = useLocation();
   const signInDialog = useSignInDialog();
+  const signOutDialog = useSignOutDialog();
+
+  function askUserSignOut() {
+    signOutDialog.openDialog();
+  }
 
   // --- Build links based on user role ---
   const links = [
@@ -46,6 +54,17 @@ export default function GlobalNavBar() {
 
   return (
     <>
+      {/* Signed-in identity display */}
+      {user && (
+        <div
+          className="float-right rounded grid grid-rows-2 cursor-pointer bg-yellow-50"
+          onClick={askUserSignOut}
+        >
+          <span>Signed in as:</span>
+          <strong>{user.displayName}</strong>
+        </div>
+      )}
+
       <NavigationMenu>
         <NavigationMenuList>
           {/* Main links */}
@@ -83,14 +102,6 @@ export default function GlobalNavBar() {
           )}
         </NavigationMenuList>
       </NavigationMenu>
-
-      {/* Signed-in identity display */}
-      {user && (
-        <div className="float-right rounded grid grid-rows-2 cursor-pointer">
-          <span>Signed in as:</span>
-          <em>{user.displayName}</em>
-        </div>
-      )}
 
       <hr className="mt-3 mb-5" />
     </>

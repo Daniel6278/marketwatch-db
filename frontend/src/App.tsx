@@ -9,6 +9,7 @@ import Tickers from "./pages/Tickers";
 import AdminDashboard from "./pages/admin/Dashboard";
 import Landing from "./pages/Landing";
 import GlobalNavBar from "./components/GlobalNavBar";
+import SignOutConfirm from "./components/SignOutConfirm";
 
 import { Button } from "./components/ui/button";
 import {
@@ -28,6 +29,7 @@ import { useContext, useState } from "react";
 import {
   useDevFeedbackDetailsDialog,
   useSignInDialog,
+  useSignOutDialog,
 } from "./context/GlobalModalDialogsStatesContext";
 import {
   ActionFeedbackToastsContext,
@@ -41,6 +43,7 @@ function App() {
   const actionFeedbackToastsContext = useContext(ActionFeedbackToastsContext);
 
   const signInDialog = useSignInDialog();
+  const signOutDialog = useSignOutDialog();
   const devFeedbackDetailsDialog = useDevFeedbackDetailsDialog();
 
   async function login(email: string, password: string) {
@@ -63,6 +66,7 @@ function App() {
             actionFeedbackToastsContext
           )
         );
+        signOutDialog.closeDialog();
       },
       true,
       {
@@ -70,6 +74,10 @@ function App() {
         failureFeedbackMessage: "Login failed.",
       }
     );
+  }
+
+  async function logout() {
+    activeUserContext?.setUser(null);
   }
 
   const [expandedFeedbackItem, setExpandedFeedbackItem] = useState<Feedback>();
@@ -127,6 +135,23 @@ function App() {
               onCloseButtonClick={() => devFeedbackDetailsDialog.closeDialog()}
             >
               placeholder
+            </Modal>
+          );
+        }
+        return undefined;
+      })()}
+
+      {(() => {
+        if (signOutDialog?.dialogState.isOpen) {
+          console.log("App.tsx : Sign Out Dialog Is Open");
+          return (
+            <Modal onCloseButtonClick={() => signOutDialog.closeDialog()}>
+              <SignOutConfirm
+                onAction={() => {
+                  logout(); // logout should not call closeDialog() because logout should be able to be called from failure to authenticate API (TO-DO)
+                  signOutDialog.closeDialog();
+                }}
+              />
             </Modal>
           );
         }
