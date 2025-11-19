@@ -55,8 +55,9 @@ function Tickers() {
 
   return (
     <main>
-        <h1>Tickers</h1>
-        <div>
+        <h1 className='text-4xl font-bold mb-4'>Tickers</h1>
+        <div className='mb-5 grid grid-cols-[auto_1fr] gap-5'>
+            <span className='py-1 font-medium'>Search:</span>
             <Input onChange={onSearchBarChange} value={searchBarValue}></Input>
         </div>
         <Table>

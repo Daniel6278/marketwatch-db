@@ -7,6 +7,10 @@ export class UserIdentifier {
         this.userId = userId;
         this.httpCredentials = httpCredentials;
     }
+
+    isAdmin() {
+      return Number(this.userId) === -1 || this.userId === '-1';
+    }
 }
 
 // 1. Create the Context

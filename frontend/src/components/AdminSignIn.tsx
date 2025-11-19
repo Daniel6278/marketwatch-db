@@ -37,7 +37,7 @@ const AdminSignIn: React.FC<LoginProps> = ({ onLogin }) => {
 
   return (
     <div>
-      <h2 className="mb-5 font-bold">Admin Sign In</h2>
+      <h2 className="text-2xl font-bold mb-5">Admin Sign In</h2>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">

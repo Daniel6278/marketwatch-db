@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 function Landing() {
   return (
     <main>
-        <h1 className="my-5">MarketWatch DB Project</h1>
+        <h1 className="text-5xl my-5">MarketWatch DB Project</h1>
         <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
             <Button asChild className="!text-white">
                 <a href="https://github.com/Daniel6278/marketwatch-db" target="_blank">GitHub Repo</a>

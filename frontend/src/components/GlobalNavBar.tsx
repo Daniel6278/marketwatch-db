@@ -16,6 +16,7 @@ function GlobalNavBar() {
   const signInDialog = useContext(GlobalModalDialogContext);
 
   return (
+    <>
     <NavigationMenu>
       <NavigationMenuList>
         {/* MarketWatch */}
@@ -56,16 +57,17 @@ function GlobalNavBar() {
 
         {/* User-specific links */}
         {currentUser?.user ? (
-          <NavigationMenuItem>
-            <NavigationMenuLink asChild>
-              <Link
-                to="/me"
-                className={navigationMenuTriggerStyle({ className: "text-foreground" })}
-              >
-                My Account
-              </Link>
-            </NavigationMenuLink>
-          </NavigationMenuItem>
+            (!currentUser?.user.isAdmin() ?
+            (<NavigationMenuItem>
+                <NavigationMenuLink asChild>
+                <Link
+                    to="/me"
+                    className={navigationMenuTriggerStyle({ className: "text-foreground" })}
+                >
+                    My Account
+                </Link>
+                </NavigationMenuLink>
+            </NavigationMenuItem>) : undefined)
         ) : (
           !location.pathname.includes("/admin") && (
             <NavigationMenuItem>
@@ -83,6 +85,8 @@ function GlobalNavBar() {
         )}
       </NavigationMenuList>
     </NavigationMenu>
+    <hr className='mt-3 mb-5'/>
+    </>
   );
 }
 
