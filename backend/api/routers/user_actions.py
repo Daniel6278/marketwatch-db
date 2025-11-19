@@ -2,13 +2,18 @@ from typing import Annotated
 
 from ..internal import auth
 from ..internal.demo_assignment import sql_code_return_wrapper
-from ..dependencies import DB_CONNECT_CONFIG, BAD_REQUEST_RESPONSE, DatabaseError
+from ..dependencies import (
+    DB_CONNECT_CONFIG,
+    BAD_REQUEST_RESPONSE,
+    DatabaseError,
+    get_logger,
+)
 
 from fastapi import APIRouter, Header, status, HTTPException, Depends, Body
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from starlette.responses import RedirectResponse, Response
 
-import pymysql, re
+import pymysql, re, logging
 
 router = APIRouter()
 
@@ -39,6 +44,7 @@ async def register_new_user(
     last_name: str = Body(...),
     email: str = Body(...),
     password: str = Body(...),
+    logger: logging.Logger = Depends(get_logger),
 ):
     password_hash = auth.hash_password(password)
     CONSTRAINTS = [
@@ -56,6 +62,7 @@ async def register_new_user(
                 with open(
                     "api/sql/crud_ops/create_a_user.sql", "r"
                 ) as f_sql_create_a_user:
+                    logger.info("db connected, got cursor, opened create_a_user.sql")
                     cursor.execute(
                         f_sql_create_a_user.read(),
                         {
@@ -65,8 +72,11 @@ async def register_new_user(
                             "password_hash": password_hash,
                         },
                     )
+                    logger.info("ran create_a_user.sql")
 
                 cursor.execute("SELECT LAST_INSERT_ID() AS created_user_id;")
+                logger.info("ran SELECT LAST_INSERT_ID()")
+
                 (created_user_id,) = cursor.fetchone()
 
                 conn.commit()
