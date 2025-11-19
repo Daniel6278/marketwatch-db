@@ -38,9 +38,9 @@ async def tickers_overview(
                     cursor.execute(
                         f_sql_overview_tickers.read(),
                         {
-                            "offset": pagination_params.offset,  # type: ignore
-                            "limit": pagination_params.limit,
-                            "starts_with": search_query,
+                            "offset": int(pagination_params.offset),  # type: ignore
+                            "limit": int(pagination_params.limit),
+                            "starts_with": str(search_query),
                         },
                     )
                 results = cursor.fetchall()
