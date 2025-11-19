@@ -1,13 +1,16 @@
 import AdminSignIn from "@/components/AdminSignIn";
-import { UserContext, FrontendUser } from "@/context/ActiveUserContext";
 import { useContext } from "react";
 import { apiCall } from "@/App";
 
+import { UserContext, FrontendUser } from "@/context/ActiveUserContext";
+import { ActionFeedbackToastsContext } from "@/context/ActionFeedbackToastsContext";
+
 function AdminDashboard() {
   const activeUserContext = useContext(UserContext);
+  const actionFeedbackToastsContext = useContext(ActionFeedbackToastsContext);
 
   async function login(username: string, password: string) {
-    apiCall({
+    apiCall(activeUserContext, actionFeedbackToastsContext, {
       endpoint: 'admin/signin',
       method: 'POST',
       params: {
@@ -15,7 +18,7 @@ function AdminDashboard() {
             password,
           },
     }, (credentials) => {
-        activeUserContext?.setUser(new FrontendUser(credentials));
+        activeUserContext?.setUser(new FrontendUser(credentials, activeUserContext, actionFeedbackToastsContext));
     }, true, {
       successFeedbackMessage: "Authenticated as admin.",
       failureFeedbackMessage: "Failed to sign in as admin.",
