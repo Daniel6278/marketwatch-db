@@ -1,5 +1,7 @@
 # MarketWatch DB
 
+Demo Video: https://drive.google.com/file/d/1u-X2_4Ljf_AtD2Ahj76-F5YYv4nnIeC9/view
+
 Web UI: https://marketwatch-db.onrender.com
 
 Admin Panel: https://marketwatch-db.onrender.com/admin
