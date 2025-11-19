@@ -105,7 +105,7 @@ function App() {
 
       <div
         className="fixed z-[1000]"
-        style={{ width: "300px", bottom: 0, left: 0 }}
+        style={{ width: "50rem", bottom: 0, left: 0 }}
       >
         {actionFeedbackToastsContext.items.map((feedbackItem: Feedback) => (
           <Toast
