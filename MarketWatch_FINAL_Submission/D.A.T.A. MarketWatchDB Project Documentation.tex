@@ -1,0 +1,682 @@
+\documentclass[12pt,letterpaper]{article}
+
+% Package imports
+\usepackage[utf8]{inputenc}
+\usepackage[top=1in, bottom=1.25in, left=1in, right=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{parskip}
+\setlength{\parskip}{0.5\baselineskip plus 2pt minus 1pt}
+\usepackage{changepage}
+\usepackage{float}
+\usepackage{needspace}
+
+% Hyperlink styling
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={D.A.T.A Project Documentation},
+    pdfpagemode=FullScreen,
+}
+
+% Code listing style
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegray},
+    keywordstyle=\color{blue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\scriptsize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+% Header and footer
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{D.A.T.A Project}
+\lhead{Documentation}
+\rfoot{Page \thepage}
+\lfoot{\tiny \url{https://github.com/Daniel6278/marketwatch-db}}
+
+% Title formatting
+\titleformat{\section}
+  {\normalfont\Large\bfseries}{\thesection}{1em}{}[\vspace{0.5ex}]
+\titleformat{\subsection}
+  {\normalfont\large\bfseries}{\thesubsection}{1em}{}[\vspace{0.3ex}]
+\titleformat{\subsubsection}
+  {\normalfont\normalsize\bfseries}{\thesubsubsection}{1em}{}[\vspace{0.2ex}]
+
+% Prevent widows and orphans
+\widowpenalty=10000
+\clubpenalty=10000
+
+% Document metadata
+\title{\textbf{D.A.T.A} \\ Dynamic Analysis \& Trading Alerts}
+\author{Project Documentation \\ \vspace{0.5em} \small GitHub Repository: \url{https://github.com/Daniel6278/marketwatch-db}}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Data Source \& Collection Strategy}
+
+Our database infrastructure mirrors real-time market data from the \textbf{S\&P 500 NYSE listings}, encompassing all 503 ticker symbols actively traded on the exchange. This comprehensive approach ensures broad market coverage and diverse investment opportunities for our users.
+
+\subsection{Data Acquisition Pipeline}
+
+We leverage the powerful \href{http://yahoofinance.com}{\textbf{YahooFinance.com}} platform as our primary data source, utilizing the \texttt{yfinance} Python library to programmatically extract market information. This robust solution provides reliable, up-to-date financial data with minimal latency.
+
+\textbf{Installation:}
+\begin{lstlisting}[language=bash]
+pip install yfinance
+\end{lstlisting}
+
+\subsection{Data Collection Process}
+
+Our automated data collection script retrieves historical market data within a configurable date range (\texttt{date\_start} to \texttt{date\_end}), systematically processing each ticker symbol to build a comprehensive historical database.
+
+\textbf{Data Schema Structure:}
+
+Each record in our database follows this standardized format:
+
+\begin{table}[H]
+    \begin{adjustwidth}{-1in}{-1in}
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+        \hline
+        \textbf{Ticker Symbol} & \textbf{Date} & \textbf{Open Price} & \textbf{High Price} & \textbf{Low Price} & \textbf{Close Price} & \textbf{Volume} \\
+        \hline
+        AAPL & 2024-01-15 & 182.50 & 185.20 & 181.80 & 184.90 & 52,340,000 \\
+        \hline
+        MSFT & 2024-01-15 & 375.25 & 378.60 & 374.10 & 377.80 & 28,120,000 \\
+        \hline
+        GOOGL & 2024-01-15 & 140.15 & 142.35 & 139.90 & 141.75 & 31,450,000 \\
+        \hline
+    \end{tabular}
+    \end{adjustwidth}
+    \caption{Database Schema Example - Daily Price History Records}
+    \label{tab:database_schema}
+\end{table}
+
+\textbf{Field Descriptions:}
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{ticker\_symbol}: The unique identifier for each stock (e.g., AAPL, MSFT, GOOGL)
+    \item \textbf{date}: Trading date in standardized format
+    \item \textbf{open\_price}: The price at which the stock opened trading for that day
+    \item \textbf{high\_price}: The highest price reached during the trading session
+    \item \textbf{low\_price}: The lowest price reached during the trading session
+    \item \textbf{close\_price}: The final price at market close
+    \item \textbf{volume}: The total number of shares traded during the session
+\end{itemize}
+
+\subsection{Database Infrastructure}
+
+Our data is hosted on \textbf{Amazon RDS (Relational Database Service)}, providing scalability, reliability, and automated backups. Each retrieved row is systematically injected into the database, maintaining data integrity and enabling efficient querying for real-time analysis.
+
+\textbf{Storage Optimization:}
+
+Due to database size constraints and performance considerations, we have strategically chosen to utilize \textbf{daily price histories} rather than intraday data. This approach balances data granularity with storage efficiency, allowing us to maintain extensive historical records while keeping query performance optimal.
+
+\clearpage
+
+\section{Technical Indicators \& Alert System}
+
+Our platform calculates and monitors several sophisticated technical indicators, enabling users to make informed trading decisions based on mathematical analysis of price movements and market behavior.
+
+\subsection{Supported Technical Indicators}
+
+\needspace{10\baselineskip}
+\subsubsection{1. Average True Range (ATR)}
+
+The Average True Range measures market volatility by calculating the average range between high and low prices over a specified period.
+
+\textbf{Calculation:}
+\begin{align*}
+\text{True Range} &= \max[(\text{High} - \text{Low}), |\text{High} - \text{Previous Close}|, |\text{Low} - \text{Previous Close}|] \\
+\text{ATR} &= \text{Moving Average of True Range over } N \text{ periods (typically 14 days)}
+\end{align*}
+
+\textbf{Use Case:} Helps traders assess volatility and set appropriate stop-loss levels based on normal price fluctuations.
+
+\textbf{SQL Implementation:}
+\begin{lstlisting}[language=SQL, caption={ATR Calculation Query}]
+WITH true_range AS (
+    SELECT 
+        ticker_symbol,
+        date,
+        close_price,
+        GREATEST(
+            high_price - low_price,
+            ABS(high_price - LAG(close_price) OVER (PARTITION BY ticker_symbol ORDER BY date)),
+            ABS(low_price - LAG(close_price) OVER (PARTITION BY ticker_symbol ORDER BY date))
+        ) AS tr
+    FROM Ticker
+)
+SELECT 
+    ticker_symbol,
+    date,
+    AVG(tr) OVER (
+        PARTITION BY ticker_symbol 
+        ORDER BY date 
+        ROWS BETWEEN 13 PRECEDING AND CURRENT ROW
+    ) AS atr_14
+FROM true_range
+ORDER BY ticker_symbol, date;
+\end{lstlisting}
+
+\needspace{10\baselineskip}
+\subsubsection{2. Bollinger Bands}
+
+Bollinger Bands consist of three lines that create a volatility-based envelope around price movements.
+
+\textbf{Components:}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Middle Band}: Simple Moving Average (typically 20-day SMA)
+    \item \textbf{Upper Band}: Middle Band $+ (2 \times \text{Standard Deviation})$
+    \item \textbf{Lower Band}: Middle Band $- (2 \times \text{Standard Deviation})$
+\end{itemize}
+
+\textbf{Use Case:} Identifies overbought conditions (price near upper band) and oversold conditions (price near lower band), useful for mean reversion strategies.
+
+\textbf{SQL Implementation:}
+\begin{lstlisting}[language=SQL, caption={Bollinger Bands Calculation Query}]
+WITH sma_stddev AS (
+    SELECT 
+        ticker_symbol,
+        date,
+        close_price,
+        AVG(close_price) OVER (
+            PARTITION BY ticker_symbol 
+            ORDER BY date 
+            ROWS BETWEEN 19 PRECEDING AND CURRENT ROW
+        ) AS sma_20,
+        STDDEV(close_price) OVER (
+            PARTITION BY ticker_symbol 
+            ORDER BY date 
+            ROWS BETWEEN 19 PRECEDING AND CURRENT ROW
+        ) AS stddev_20
+    FROM Ticker
+)
+SELECT 
+    ticker_symbol,
+    date,
+    close_price,
+    sma_20 AS middle_band,
+    sma_20 + (2 * stddev_20) AS upper_band,
+    sma_20 - (2 * stddev_20) AS lower_band
+FROM sma_stddev
+ORDER BY ticker_symbol, date;
+\end{lstlisting}
+
+\needspace{10\baselineskip}
+\subsubsection{3. Moving Average Crossover}
+
+This indicator tracks the intersection points of two moving averages with different time periods to identify trend changes.
+
+\textbf{Common Configurations:}
+\begin{itemize}[leftmargin=*]
+    \item Short-term MA: 50-day moving average
+    \item Long-term MA: 200-day moving average
+\end{itemize}
+
+\textbf{Signals:}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Golden Cross}: Short-term MA crosses above long-term MA (bullish signal)
+    \item \textbf{Death Cross}: Short-term MA crosses below long-term MA (bearish signal)
+\end{itemize}
+
+\textbf{Use Case:} Identifies potential trend reversals and entry/exit points for position trading.
+
+\textbf{SQL Implementation:}
+\begin{lstlisting}[language=SQL, caption={Moving Average Crossover Detection Query}]
+WITH moving_averages AS (
+    SELECT 
+        ticker_symbol,
+        date,
+        close_price,
+        AVG(close_price) OVER (
+            PARTITION BY ticker_symbol 
+            ORDER BY date 
+            ROWS BETWEEN 49 PRECEDING AND CURRENT ROW
+        ) AS ma_50,
+        AVG(close_price) OVER (
+            PARTITION BY ticker_symbol 
+            ORDER BY date 
+            ROWS BETWEEN 199 PRECEDING AND CURRENT ROW
+        ) AS ma_200,
+        LAG(AVG(close_price) OVER (
+            PARTITION BY ticker_symbol 
+            ORDER BY date 
+            ROWS BETWEEN 49 PRECEDING AND CURRENT ROW
+        )) OVER (PARTITION BY ticker_symbol ORDER BY date) AS prev_ma_50,
+        LAG(AVG(close_price) OVER (
+            PARTITION BY ticker_symbol 
+            ORDER BY date 
+            ROWS BETWEEN 199 PRECEDING AND CURRENT ROW
+        )) OVER (PARTITION BY ticker_symbol ORDER BY date) AS prev_ma_200
+    FROM Ticker
+)
+SELECT 
+    ticker_symbol,
+    date,
+    close_price,
+    ma_50,
+    ma_200,
+    CASE 
+        WHEN ma_50 > ma_200 AND prev_ma_50 <= prev_ma_200 THEN 'Golden Cross'
+        WHEN ma_50 < ma_200 AND prev_ma_50 >= prev_ma_200 THEN 'Death Cross'
+        ELSE 'No Signal'
+    END AS crossover_signal
+FROM moving_averages
+WHERE ma_50 IS NOT NULL AND ma_200 IS NOT NULL
+ORDER BY ticker_symbol, date;
+\end{lstlisting}
+
+\needspace{10\baselineskip}
+\subsubsection{4. Moving Average Convergence Divergence (MACD)}
+
+MACD is a momentum indicator that shows the relationship between two exponential moving averages of prices.
+
+\textbf{Calculation:}
+\begin{align*}
+\text{MACD Line} &= \text{12-period EMA} - \text{26-period EMA} \\
+\text{Signal Line} &= \text{9-period EMA of MACD Line} \\
+\text{Histogram} &= \text{MACD Line} - \text{Signal Line}
+\end{align*}
+
+\textbf{Signals:}
+\begin{itemize}[leftmargin=*]
+    \item MACD crossing above Signal Line: Bullish
+    \item MACD crossing below Signal Line: Bearish
+    \item Divergence between MACD and price: Potential reversal
+\end{itemize}
+
+\textbf{Use Case:} Identifies momentum shifts, trend strength, and potential reversal points.
+
+\textbf{SQL Implementation:}
+\begin{lstlisting}[language=SQL, caption={MACD Calculation Query}]
+WITH ema_12 AS (
+    SELECT 
+        ticker_symbol,
+        date,
+        close_price,
+        AVG(close_price) OVER (
+            PARTITION BY ticker_symbol 
+            ORDER BY date 
+            ROWS BETWEEN 11 PRECEDING AND CURRENT ROW
+        ) AS ema_12
+    FROM Ticker
+),
+ema_26 AS (
+    SELECT 
+        ticker_symbol,
+        date,
+        close_price,
+        AVG(close_price) OVER (
+            PARTITION BY ticker_symbol 
+            ORDER BY date 
+            ROWS BETWEEN 25 PRECEDING AND CURRENT ROW
+        ) AS ema_26
+    FROM Ticker
+),
+macd_line AS (
+    SELECT 
+        e12.ticker_symbol,
+        e12.date,
+        e12.close_price,
+        e12.ema_12 - e26.ema_26 AS macd
+    FROM ema_12 e12
+    JOIN ema_26 e26 
+        ON e12.ticker_symbol = e26.ticker_symbol 
+        AND e12.date = e26.date
+)
+SELECT 
+    ticker_symbol,
+    date,
+    close_price,
+    macd AS macd_line,
+    AVG(macd) OVER (
+        PARTITION BY ticker_symbol 
+        ORDER BY date 
+        ROWS BETWEEN 8 PRECEDING AND CURRENT ROW
+    ) AS signal_line,
+    macd - AVG(macd) OVER (
+        PARTITION BY ticker_symbol 
+        ORDER BY date 
+        ROWS BETWEEN 8 PRECEDING AND CURRENT ROW
+    ) AS histogram
+FROM macd_line
+ORDER BY ticker_symbol, date;
+\end{lstlisting}
+
+\needspace{10\baselineskip}
+\subsubsection{5. Relative Strength Index (RSI)}
+
+RSI is a momentum oscillator that measures the speed and magnitude of price changes, ranging from 0 to 100.
+
+\textbf{Calculation:}
+\begin{align*}
+\text{RS} &= \frac{\text{Average Gain}}{\text{Average Loss}} \text{ (over 14 periods)} \\
+\text{RSI} &= 100 - \frac{100}{(1 + \text{RS})}
+\end{align*}
+
+\textbf{Interpretation:}
+\begin{itemize}[leftmargin=*]
+    \item RSI $> 70$: Overbought condition (potential sell signal)
+    \item RSI $< 30$: Oversold condition (potential buy signal)
+    \item RSI $= 50$: Neutral momentum
+\end{itemize}
+
+\textbf{Use Case:} Identifies overbought/oversold conditions and potential reversal points through divergence analysis.
+
+\textbf{SQL Implementation:}
+\begin{lstlisting}[language=SQL, caption={RSI Calculation Query}]
+WITH price_changes AS (
+    SELECT 
+        ticker_symbol,
+        date,
+        close_price,
+        close_price - LAG(close_price) OVER (
+            PARTITION BY ticker_symbol ORDER BY date
+        ) AS price_change
+    FROM Ticker
+),
+gains_losses AS (
+    SELECT 
+        ticker_symbol,
+        date,
+        close_price,
+        CASE WHEN price_change > 0 THEN price_change ELSE 0 END AS gain,
+        CASE WHEN price_change < 0 THEN ABS(price_change) ELSE 0 END AS loss
+    FROM price_changes
+),
+avg_gain_loss AS (
+    SELECT 
+        ticker_symbol,
+        date,
+        close_price,
+        AVG(gain) OVER (
+            PARTITION BY ticker_symbol 
+            ORDER BY date 
+            ROWS BETWEEN 13 PRECEDING AND CURRENT ROW
+        ) AS avg_gain,
+        AVG(loss) OVER (
+            PARTITION BY ticker_symbol 
+            ORDER BY date 
+            ROWS BETWEEN 13 PRECEDING AND CURRENT ROW
+        ) AS avg_loss
+    FROM gains_losses
+)
+SELECT 
+    ticker_symbol,
+    date,
+    close_price,
+    CASE 
+        WHEN avg_loss = 0 THEN 100
+        ELSE 100 - (100 / (1 + (avg_gain / avg_loss)))
+    END AS rsi_14
+FROM avg_gain_loss
+WHERE avg_gain IS NOT NULL AND avg_loss IS NOT NULL
+ORDER BY ticker_symbol, date;
+\end{lstlisting}
+
+\needspace{10\baselineskip}
+\subsubsection{6. Stochastic Oscillator}
+
+The Stochastic Oscillator compares a stock's closing price to its price range over a specific period, generating values between 0 and 100.
+
+\textbf{Calculation:}
+\begin{align*}
+\%K &= \frac{(\text{Current Close} - \text{Lowest Low})}{(\text{Highest High} - \text{Lowest Low})} \times 100 \\
+\%D &= \text{3-period moving average of } \%K
+\end{align*}
+
+\textbf{Interpretation:}
+\begin{itemize}[leftmargin=*]
+    \item Values $> 80$: Overbought territory
+    \item Values $< 20$: Oversold territory
+    \item $\%K$ crossing above $\%D$: Bullish signal
+    \item $\%K$ crossing below $\%D$: Bearish signal
+\end{itemize}
+
+\textbf{Use Case:} Identifies momentum changes and potential reversal points in trending or ranging markets.
+
+\textbf{SQL Implementation:}
+\begin{lstlisting}[language=SQL, caption={Stochastic Oscillator Calculation Query}]
+WITH price_ranges AS (
+    SELECT 
+        ticker_symbol,
+        date,
+        close_price,
+        high_price,
+        low_price,
+        MIN(low_price) OVER (
+            PARTITION BY ticker_symbol 
+            ORDER BY date 
+            ROWS BETWEEN 13 PRECEDING AND CURRENT ROW
+        ) AS lowest_low_14,
+        MAX(high_price) OVER (
+            PARTITION BY ticker_symbol 
+            ORDER BY date 
+            ROWS BETWEEN 13 PRECEDING AND CURRENT ROW
+        ) AS highest_high_14
+    FROM Ticker
+),
+percent_k AS (
+    SELECT 
+        ticker_symbol,
+        date,
+        close_price,
+        CASE 
+            WHEN (highest_high_14 - lowest_low_14) = 0 THEN 0
+            ELSE ((close_price - lowest_low_14) / (highest_high_14 - lowest_low_14)) * 100
+        END AS k_value
+    FROM price_ranges
+)
+SELECT 
+    ticker_symbol,
+    date,
+    close_price,
+    k_value AS percent_k,
+    AVG(k_value) OVER (
+        PARTITION BY ticker_symbol 
+        ORDER BY date 
+        ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+    ) AS percent_d,
+    CASE 
+        WHEN k_value > 80 THEN 'Overbought'
+        WHEN k_value < 20 THEN 'Oversold'
+        ELSE 'Neutral'
+    END AS signal
+FROM percent_k
+ORDER BY ticker_symbol, date;
+\end{lstlisting}
+
+\clearpage
+
+\section{Business Rules \& System Architecture}
+
+Our platform operates under a well-defined set of business rules that govern user interactions, data relationships, and system behavior. These rules ensure data integrity, security, and optimal user experience.
+
+\subsection{User Management Rules}
+
+\subsubsection{Registration \& Authentication}
+\begin{itemize}[leftmargin=*]
+    \item Every User \textbf{must} provide a unique email address during registration
+    \item Passwords are required and must meet security standards (hashed and salted in database)
+    \item Email uniqueness is enforced at the database level to prevent duplicate accounts
+    \item Users authenticate via email/password combination for secure access
+\end{itemize}
+
+\subsection{Portfolio Management Rules}
+
+\subsubsection{User-Portfolio Relationship}
+\begin{itemize}[leftmargin=*]
+    \item A User \textbf{can create and own} one or many Portfolios
+    \begin{itemize}
+        \item Example: A user might maintain separate portfolios for ``Long-term Investments,'' ``Day Trading,'' and ``Cryptocurrency''
+    \end{itemize}
+    \item Each Portfolio \textbf{belongs to exactly one User}
+    \begin{itemize}
+        \item Ensures clear ownership and prevents unauthorized access
+        \item Portfolios are not shareable between users (maintains data privacy)
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Portfolio-Ticker Relationship}
+\begin{itemize}[leftmargin=*]
+    \item A Portfolio \textbf{can contain} zero or many Tickers
+    \begin{itemize}
+        \item New portfolios start empty (zero tickers)
+        \item Users can add multiple stocks to track
+        \item No upper limit on the number of tickers per portfolio
+    \end{itemize}
+    \item Users have full CRUD (Create, Read, Update, Delete) capabilities:
+    \begin{itemize}
+        \item \textbf{Add}: Insert new tickers to their watch-list
+        \item \textbf{Remove}: Delete tickers they no longer wish to track
+        \item \textbf{Update}: Modify ticker-specific settings or notes
+    \end{itemize}
+\end{itemize}
+
+\subsection{Data Integrity Rules}
+
+\subsubsection{Stock-Price History Relationship}
+\begin{itemize}[leftmargin=*]
+    \item A Stock (Ticker) \textbf{has} zero or many Price Histories
+    \begin{itemize}
+        \item Newly listed stocks may have limited historical data
+        \item Mature stocks have extensive price history spanning years
+        \item Each price history record represents one trading day
+    \end{itemize}
+    \item Historical data is immutable once recorded (maintains data integrity)
+    \item Daily updates append new records without modifying existing ones
+\end{itemize}
+
+\subsection{Alert System Rules}
+
+\subsubsection{User-Alert Relationship}
+\begin{itemize}[leftmargin=*]
+    \item A User \textbf{can set} zero or many Alerts
+    \begin{itemize}
+        \item Users are not required to set alerts (optional feature)
+        \item Power users may configure multiple alerts across different indicators
+        \item Examples: ``Alert me when AAPL RSI drops below 30'' or ``Notify when TSLA crosses 50-day MA''
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Alert-User Relationship}
+\begin{itemize}[leftmargin=*]
+    \item An Alert \textbf{belongs to} one or many Users
+    \begin{itemize}
+        \item Allows for future features like shared alerts or community signals
+        \item Currently implemented as one-to-one (one alert per user)
+        \item Architecture supports future expansion to alert subscriptions
+    \end{itemize}
+\end{itemize}
+
+\subsection{Data Access \& Permissions}
+
+\subsubsection{Authorization Rules}
+\begin{itemize}[leftmargin=*]
+    \item Users can only access their own portfolios and alerts
+    \item Administrative users have read-only access to aggregate data (no PII access)
+    \item API rate limiting prevents abuse and ensures fair resource allocation
+\end{itemize}
+
+\subsubsection{Data Retention Rules}
+\begin{itemize}[leftmargin=*]
+    \item Price history data is retained indefinitely for analysis
+    \item User accounts remain active until explicitly deleted by the user
+    \item Deleted portfolios are soft-deleted (archived) for 30 days before permanent removal
+\end{itemize}
+
+\newpage
+
+\section{System Architecture Summary}
+
+\subsection{Source Code Repository}
+
+The complete source code for this project is available on GitHub:
+
+\begin{center}
+\url{https://github.com/Daniel6278/marketwatch-db}
+\end{center}
+
+The repository contains:
+\begin{itemize}[leftmargin=*]
+    \item Data collection scripts using yfinance
+    \item Database schema and migration files
+    \item Technical indicator calculation implementations
+    \item Alert system logic and configurations
+    \item API endpoints and backend services
+    \item Documentation and setup instructions
+\end{itemize}
+
+\subsection{Technology Stack}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Backend}: Python with yfinance for data acquisition
+    \item \textbf{Database}: Amazon RDS (Relational Database)
+    \item \textbf{Data Frequency}: Daily granularity for optimal storage/performance balance
+    \item \textbf{Coverage}: 503 tickers from S\&P 500 NYSE listings
+\end{itemize}
+
+\subsection{Key Features}
+\begin{itemize}[leftmargin=*]
+    \item Automated daily data collection from Yahoo Finance
+    \item Real-time calculation of six major technical indicators
+    \item Customizable alert system based on indicator thresholds
+    \item Multi-portfolio support for diverse investment strategies
+    \item Secure user authentication and data isolation
+\end{itemize}
+
+\subsection{Performance Considerations}
+\begin{itemize}[leftmargin=*]
+    \item Daily data updates reduce API load and storage requirements
+    \item Indexed database queries for fast portfolio and alert lookups
+    \item Efficient calculation algorithms for technical indicators
+    \item Scalable architecture supporting additional tickers and users
+\end{itemize}
+
+\section{Future Enhancements}
+
+Potential areas for platform expansion include:
+\begin{itemize}[leftmargin=*]
+    \item Intraday data support for active traders
+    \item Additional technical indicators (Fibonacci retracements, Ichimoku Cloud)
+    \item Machine learning-based price prediction models
+    \item Social features for sharing strategies and insights
+    \item Mobile application for on-the-go portfolio monitoring
+    \item Real-time push notifications for alert triggers
+    \item Integration with brokerage APIs for automated trading
+\end{itemize}
+
+\end{document}
